@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3349">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Витамины">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+<title>Контроль витаминов</title>
+</head>
+<body>
+<header><div><small>Ежедневный контроль</small><h1>Витамины</h1></div></header>
+<main>
+<div class="switch"><button class="profile active" data-profile="man">Мужчина</button><button class="profile" data-profile="woman">Женщина</button></div>
+<section class="date"><button id="prev">‹</button><div><b id="dateLabel"></b><span id="progressLabel"></span></div><button id="next">›</button></section>
+<div class="bar"><i id="bar"></i></div>
+<section id="items"></section>
+<div class="actions"><button id="all" class="primary">Отметить всё</button><button id="reset">Сбросить день</button></div>
+<section class="panel">
+<h2>Уведомления на iPhone</h2>
+<p>Скачайте нужный календарь и добавьте повторяющиеся события. Время можно изменить после импорта.</p>
+<div class="calendar"><a href="reminders-man.ics" download>Мужчина</a><a href="reminders-woman.ics" download>Женщина</a></div>
+<button id="notify">Разрешить уведомления сайта</button>
+<p class="small">Для фоновых push-уведомлений закрытого веб-приложения нужен отдельный сервер. Календарные напоминания работают надёжнее.</p>
+</section>
+<section class="panel"><h2>История за 7 дней</h2><div id="history" class="history"></div></section>
+<section class="panel warning"><h2>Важно</h2><p>Точные дозировки — по этикеткам. 5‑HTP не сочетать с антидепрессантами и другими серотонинергическими средствами без согласования с врачом.</p></section>
+</main>
+<footer>Данные сохраняются только на этом устройстве.</footer>
+<script src="app.js"></script>
+</body></html>
