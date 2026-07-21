@@ -5,30 +5,103 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1f3349">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Витамины">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="app-icon-180-v4.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32-v4.png">
 <link rel="stylesheet" href="style.css">
 <title>Контроль витаминов</title>
 </head>
 <body>
-<header><div><small>Ежедневный контроль</small><h1>Витамины</h1></div></header>
+<header>
+  <div><small>Ежедневный контроль</small><h1>Витамины</h1></div>
+  <button id="settingsBtn" class="icon-btn" aria-label="Настройки">⚙︎</button>
+</header>
+
 <main>
-<div class="switch"><button class="profile active" data-profile="man">Мужчина</button><button class="profile" data-profile="woman">Женщина</button></div>
-<section class="date"><button id="prev">‹</button><div><b id="dateLabel"></b><span id="progressLabel"></span></div><button id="next">›</button></section>
-<div class="bar"><i id="bar"></i></div>
-<section id="items"></section>
-<div class="actions"><button id="all" class="primary">Отметить всё</button><button id="reset">Сбросить день</button></div>
-<section class="panel">
-<h2>Уведомления на iPhone</h2>
-<p>Скачайте нужный календарь и добавьте повторяющиеся события. Время можно изменить после импорта.</p>
-<div class="calendar"><a href="reminders-man.ics" download>Мужчина</a><a href="reminders-woman.ics" download>Женщина</a></div>
-<button id="notify">Разрешить уведомления сайта</button>
-<p class="small">Для фоновых push-уведомлений закрытого веб-приложения нужен отдельный сервер. Календарные напоминания работают надёжнее.</p>
-</section>
-<section class="panel"><h2>История за 7 дней</h2><div id="history" class="history"></div></section>
-<section class="panel warning"><h2>Важно</h2><p>Точные дозировки — по этикеткам. 5‑HTP не сочетать с антидепрессантами и другими серотонинергическими средствами без согласования с врачом.</p></section>
+  <div class="switch">
+    <button class="profile active" data-profile="man">Мужчина</button>
+    <button class="profile" data-profile="woman">Женщина</button>
+  </div>
+
+  <section class="date">
+    <button id="prev" aria-label="Предыдущий день">‹</button>
+    <div><b id="dateLabel"></b><span id="progressLabel"></span></div>
+    <button id="next" aria-label="Следующий день">›</button>
+  </section>
+
+  <div class="bar"><i id="bar"></i></div>
+  <section id="items"></section>
+
+  <div class="actions">
+    <button id="all" class="primary">Отметить всё</button>
+    <button id="reset">Сбросить день</button>
+  </div>
+
+  <section id="notificationPanel" class="panel">
+    <div class="panel-head">
+      <div><h2>Уведомления на iPhone</h2><span id="notifyStatus" class="status-pill">Не настроено</span></div>
+      <button id="hideNotify" class="close-btn" aria-label="Скрыть">×</button>
+    </div>
+    <p>Сначала разрешите уведомления, затем добавьте календарь с вашим текущим расписанием.</p>
+    <div class="steps">
+      <button id="notify" class="step-btn"><span>1</span>Разрешить уведомления</button>
+      <button id="calendarBtn" class="step-btn"><span>2</span>Добавить расписание в календарь</button>
+      <button id="calendarConfirm" class="step-btn hidden"><span>✓</span>Подтвердить, что календарь добавлен</button>
+    </div>
+    <p class="small">После выполнения двух шагов этот блок исчезнет автоматически. Его можно снова открыть в настройках.</p>
+  </section>
+
+  <section class="panel">
+    <h2>История за 7 дней</h2>
+    <div id="history" class="history"></div>
+  </section>
+
+  <section class="panel warning">
+    <h2>Важно</h2>
+    <p>Точные дозировки — по этикеткам. 5‑HTP нельзя сочетать с антидепрессантами и другими серотонинергическими средствами без согласования с врачом. Отдельные цинк, магний и B6 нужно учитывать вместе с комплексами Men/Women и Brain.</p>
+  </section>
 </main>
-<footer>Данные сохраняются только на этом устройстве.</footer>
+
+<div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-head"><div><small>Профиль</small><h2 id="settingsTitle">Настройки</h2></div><button id="closeSettings" class="close-btn">×</button></div>
+    <p class="muted">Измените время приёма. Новые значения сохранятся на устройстве и попадут в календарь при следующем добавлении расписания.</p>
+    <div id="timeSettings" class="time-settings"></div>
+
+    <button id="addVitaminBtn" class="add-vitamin-btn">＋ Добавить витамин</button>
+
+    <section id="addVitaminForm" class="add-form hidden">
+      <h3 id="vitaminFormTitle">Новый витамин</h3>
+      <label>
+        <span>Название</span>
+        <input id="newVitaminName" type="text" placeholder="Например: Витамин D3" maxlength="60">
+      </label>
+      <label>
+        <span>Время приёма</span>
+        <input id="newVitaminTime" type="time" value="12:00">
+      </label>
+      <label>
+        <span>Описание или дозировка</span>
+        <textarea id="newVitaminDetails" rows="3" placeholder="Например: 1 капсула после еды"></textarea>
+      </label>
+      <div class="form-actions">
+        <button id="cancelVitamin">Отмена</button>
+        <button id="saveVitamin" class="primary">Добавить</button>
+      </div>
+    </section>
+
+    <div class="modal-actions">
+      <button id="restoreTimes">Вернуть стандартный список</button>
+      <button id="saveTimes" class="primary">Сохранить изменения</button>
+    </div>
+    <button id="showNotifyPanel" class="link-btn">Показать настройку уведомлений</button>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<footer>Данные и настройки сохраняются только на этом устройстве.</footer>
 <script src="app.js"></script>
-</body></html>
+</body>
+</html>
