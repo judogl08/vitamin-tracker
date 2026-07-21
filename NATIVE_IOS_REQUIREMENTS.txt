@@ -1,0 +1,20 @@
+Для трёх системных функций нужна отдельная нативная iOS-версия:
+
+1. Виджет на экран iPhone
+   - SwiftUI + WidgetKit Extension
+   - App Group для общего хранилища приложения и виджета
+   - интерактивные App Intents для отметки приёма
+
+2. Apple Health
+   - HealthKit capability в Xcode
+   - разрешения пользователя на нужные типы данных
+   - Medications API для чтения лекарств и событий приёма, где применимо
+   - отдельная политика конфиденциальности и соблюдение правил App Store для health data
+
+3. Автоматическая синхронизация iPhone / iPad / Mac
+   - CloudKit capability
+   - iCloud container
+   - SwiftData/Core Data + CloudKit либо CloudKit records
+   - Apple Developer account и подпись приложения
+
+GitHub Pages не может выдавать эти системные capabilities сайту.

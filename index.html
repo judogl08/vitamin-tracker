@@ -5,103 +5,218 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1f3349">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Витамины">
-<link rel="manifest" href="manifest.webmanifest?v=5">
-<link rel="apple-touch-icon" sizes="180x180" href="app-icon-180-v5.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32-v5.png">
-<link rel="stylesheet" href="style.css?v=5">
-<title>Контроль витаминов</title>
+<link rel="manifest" href="manifest.webmanifest?v=7">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v7.png?v=7">
+<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-v7.png?v=7">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32-v7.png?v=7">
+<link rel="stylesheet" href="style.css?v=7">
+<title>Vitamin Tracker Pro</title>
 </head>
-<body>
+<body data-profile="man" data-theme="system">
+<div id="lockScreen" class="lock-screen hidden">
+  <div class="lock-card">
+    <img src="app-icon-192-v7.png" alt="">
+    <small>Vitamin Tracker Pro</small>
+    <h1>Приложение заблокировано</h1>
+    <p>Подтвердите вход через Face ID, Touch ID или код устройства.</p>
+    <button id="unlockBtn" class="primary big">Открыть с Face ID</button>
+    <button id="unlockFallback" class="link-btn hidden">Открыть без биометрии</button>
+    <p id="lockError" class="error-text"></p>
+  </div>
+</div>
+
 <header>
-  <div><small>Ежедневный контроль</small><h1>Витамины</h1></div>
-  <button id="settingsBtn" class="icon-btn" aria-label="Настройки">⚙︎</button>
+  <div>
+    <small>Ежедневный контроль</small>
+    <h1>Витамины</h1>
+  </div>
+  <div class="header-actions">
+    <button id="quickThemeBtn" class="icon-btn" aria-label="Переключить тему">◐</button>
+    <button id="settingsBtn" class="icon-btn" aria-label="Настройки">⚙︎</button>
+  </div>
 </header>
 
 <main>
-  <div class="switch">
-    <button class="profile active" data-profile="man">Мужчина</button>
-    <button class="profile" data-profile="woman">Женщина</button>
+  <div class="switch profile-switch">
+    <button class="profile active" data-profile="man"><span>М</span> Мужчина</button>
+    <button class="profile" data-profile="woman"><span>Ж</span> Женщина</button>
   </div>
 
-  <section class="date">
-    <button id="prev" aria-label="Предыдущий день">‹</button>
-    <div><b id="dateLabel"></b><span id="progressLabel"></span></div>
-    <button id="next" aria-label="Следующий день">›</button>
-  </section>
+  <section id="todayView" class="view active">
+    <section class="hero-card">
+      <div class="hero-top">
+        <div>
+          <small id="heroProfile">Мужской профиль</small>
+          <h2 id="heroGreeting">Сегодня</h2>
+        </div>
+        <div class="hero-ring"><strong id="heroPercent">0%</strong></div>
+      </div>
+      <div class="date-row">
+        <button id="prev" aria-label="Предыдущий день">‹</button>
+        <div><b id="dateLabel"></b><span id="progressLabel"></span></div>
+        <button id="next" aria-label="Следующий день">›</button>
+      </div>
+      <div class="bar"><i id="bar"></i></div>
+    </section>
 
-  <div class="bar"><i id="bar"></i></div>
-  <section id="items"></section>
+    <section id="lowStockPanel" class="panel alert-panel hidden">
+      <div class="panel-head"><div><small>Нужно купить</small><h2>Заканчиваются добавки</h2></div><button class="mini-btn" data-go="stock">Открыть</button></div>
+      <div id="lowStockToday"></div>
+    </section>
 
-  <div class="actions">
-    <button id="all" class="primary">Отметить всё</button>
-    <button id="reset">Сбросить день</button>
-  </div>
+    <section id="items" class="vitamin-list"></section>
 
-  <section id="notificationPanel" class="panel">
-    <div class="panel-head">
-      <div><h2>Уведомления на iPhone</h2><span id="notifyStatus" class="status-pill">Не настроено</span></div>
-      <button id="hideNotify" class="close-btn" aria-label="Скрыть">×</button>
+    <div class="actions">
+      <button id="all" class="primary">Отметить всё</button>
+      <button id="reset">Сбросить день</button>
     </div>
-    <p>Сначала разрешите уведомления, затем добавьте календарь с вашим текущим расписанием.</p>
-    <div class="steps">
-      <button id="notify" class="step-btn"><span>1</span>Разрешить уведомления</button>
-      <button id="calendarBtn" class="step-btn"><span>2</span>Добавить расписание в календарь</button>
-      <button id="calendarConfirm" class="step-btn hidden"><span>✓</span>Подтвердить, что календарь добавлен</button>
-    </div>
-    <p class="small">После выполнения двух шагов этот блок исчезнет автоматически. Его можно снова открыть в настройках.</p>
-  </section>
 
-  <section class="panel">
-    <h2>История за 7 дней</h2>
-    <div id="history" class="history"></div>
-  </section>
-
-  <section class="panel warning">
-    <h2>Важно</h2>
-    <p>Точные дозировки — по этикеткам. 5‑HTP нельзя сочетать с антидепрессантами и другими серотонинергическими средствами без согласования с врачом. Отдельные цинк, магний и B6 нужно учитывать вместе с комплексами Men/Women и Brain.</p>
-  </section>
-</main>
-
-<div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-card">
-    <div class="modal-head"><div><small>Профиль</small><h2 id="settingsTitle">Настройки</h2></div><button id="closeSettings" class="close-btn">×</button></div>
-    <p class="muted">Измените время приёма. Новые значения сохранятся на устройстве и попадут в календарь при следующем добавлении расписания.</p>
-    <div id="timeSettings" class="time-settings"></div>
-
-    <button id="addVitaminBtn" class="add-vitamin-btn">＋ Добавить витамин</button>
-
-    <section id="addVitaminForm" class="add-form hidden">
-      <h3 id="vitaminFormTitle">Новый витамин</h3>
-      <label>
-        <span>Название</span>
-        <input id="newVitaminName" type="text" placeholder="Например: Витамин D3" maxlength="60">
-      </label>
-      <label>
-        <span>Время приёма</span>
-        <input id="newVitaminTime" type="time" value="12:00">
-      </label>
-      <label>
-        <span>Описание или дозировка</span>
-        <textarea id="newVitaminDetails" rows="3" placeholder="Например: 1 капсула после еды"></textarea>
-      </label>
-      <div class="form-actions">
-        <button id="cancelVitamin">Отмена</button>
-        <button id="saveVitamin" class="primary">Добавить</button>
+    <section id="notificationPanel" class="panel">
+      <div class="panel-head">
+        <div><small>iPhone</small><h2>Уведомления и календарь</h2><span id="notifyStatus" class="status-pill">Не настроено</span></div>
+        <button id="hideNotify" class="close-btn" aria-label="Скрыть">×</button>
+      </div>
+      <p>Разрешите уведомления и добавьте актуальное расписание в календарь.</p>
+      <div class="steps">
+        <button id="notify" class="step-btn"><span>1</span>Разрешить уведомления</button>
+        <button id="calendarBtn" class="step-btn"><span>2</span>Добавить расписание в календарь</button>
+        <button id="calendarConfirm" class="step-btn hidden"><span>✓</span>Подтвердить добавление календаря</button>
       </div>
     </section>
 
-    <div class="modal-actions">
-      <button id="restoreTimes">Вернуть стандартный список</button>
-      <button id="saveTimes" class="primary">Сохранить изменения</button>
+    <section class="panel">
+      <div class="panel-head"><div><small>Динамика</small><h2>Последние 7 дней</h2></div></div>
+      <div id="history" class="history"></div>
+    </section>
+  </section>
+
+  <section id="coursesView" class="view">
+    <section class="section-title"><div><small>Длительность и паузы</small><h2>Курсы</h2></div><button id="newCourseVitamin" class="primary compact">＋ Добавить</button></section>
+    <div id="coursesList" class="card-list"></div>
+  </section>
+
+  <section id="journalView" class="view">
+    <section class="section-title"><div><small>Контроль дисциплины</small><h2>Журнал пропусков</h2></div></section>
+    <div id="journalStats" class="stat-grid"></div>
+    <div id="missedJournal" class="card-list"></div>
+  </section>
+
+  <section id="stockView" class="view">
+    <section class="section-title"><div><small>Остатки и покупки</small><h2>Запасы</h2></div><button id="stockReminderAll" class="secondary compact">Напомнить купить</button></section>
+    <section id="shoppingPanel" class="panel hidden"><h2>Список покупок</h2><div id="shoppingList"></div></section>
+    <div id="stockList" class="card-list"></div>
+  </section>
+
+  <section id="settingsView" class="view">
+    <section class="section-title"><div><small>Персонализация и данные</small><h2>Настройки</h2></div></section>
+
+    <section class="panel">
+      <h2>Оформление</h2>
+      <div class="segmented" id="themeSelector">
+        <button data-theme-value="system">Система</button>
+        <button data-theme-value="light">Светлая</button>
+        <button data-theme-value="dark">Тёмная</button>
+      </div>
+      <div class="color-grid">
+        <label><span>Цвет мужчины</span><input id="manAccent" type="color"></label>
+        <label><span>Цвет женщины</span><input id="womanAccent" type="color"></label>
+      </div>
+      <p class="muted">Мужской профиль по умолчанию — тёмно-синий с оранжевым. Женский — сливовый с розовым.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><small>Защита</small><h2>Face ID при открытии</h2></div><span id="bioStatus" class="status-pill">Выключено</span></div>
+      <p>Используется системная биометрия через защищённый механизм passkey. Работает только на HTTPS и поддерживаемых устройствах.</p>
+      <div class="button-grid">
+        <button id="enableBio" class="primary">Настроить Face ID</button>
+        <button id="disableBio" class="danger">Отключить</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><small>iCloud Drive</small><h2>Резервная копия и перенос</h2></div></div>
+      <p>Экспортируйте один файл со всеми профилями, курсами, запасами и журналом. На iPhone сохраните его в «Файлы → iCloud Drive».</p>
+      <div class="button-grid">
+        <button id="exportBackup" class="primary">Создать копию</button>
+        <label class="file-button">Восстановить<input id="importBackup" type="file" accept="application/json,.json"></label>
+      </div>
+      <div id="backupInfo" class="info-line"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><small>Устройства Apple</small><h2>Интеграции</h2></div></div>
+      <div class="integration-list">
+        <div><b>Face ID / Touch ID</b><span class="feature-ok">Доступно в веб-версии</span></div>
+        <div><b>Тёмная тема</b><span class="feature-ok">Доступно</span></div>
+        <div><b>Резервная копия в iCloud Drive</b><span class="feature-ok">Через «Файлы»</span></div>
+        <div><b>Автоматическая синхронизация</b><span class="feature-native">Нужен CloudKit</span></div>
+        <div><b>Виджет на экран iPhone</b><span class="feature-native">Нужен WidgetKit</span></div>
+        <div><b>Apple Health</b><span class="feature-native">Нужна нативная iOS-версия</span></div>
+      </div>
+      <p class="muted">Функции с пометкой «нужна нативная версия» невозможно включить в сайт на GitHub Pages без iOS-приложения, Apple Developer и системных разрешений.</p>
+    </section>
+
+    <section class="panel widget-preview-panel">
+      <div class="panel-head"><div><small>Макет</small><h2>Будущий виджет</h2></div></div>
+      <div id="widgetPreview" class="widget-preview"></div>
+    </section>
+
+    <section class="panel warning">
+      <h2>Важно</h2>
+      <p>Приложение предназначено для контроля расписания, а не для назначения лечения. Точные дозировки проверяйте по этикеткам и рекомендациям врача. 5‑HTP может взаимодействовать с серотонинергическими препаратами.</p>
+    </section>
+  </section>
+</main>
+
+<nav class="bottom-nav" aria-label="Разделы">
+  <button class="nav-btn active" data-view="today"><span>✓</span>Сегодня</button>
+  <button class="nav-btn" data-view="courses"><span>◷</span>Курсы</button>
+  <button class="nav-btn" data-view="journal"><span>≡</span>Журнал</button>
+  <button class="nav-btn" data-view="stock"><span>▣</span>Запасы</button>
+  <button class="nav-btn" data-view="settings"><span>⚙</span>Настройки</button>
+</nav>
+
+<div id="vitaminModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-head"><div><small id="modalProfileLabel">Профиль</small><h2 id="vitaminFormTitle">Витамин</h2></div><button id="closeVitaminModal" class="close-btn">×</button></div>
+    <div class="form-grid">
+      <label class="full"><span>Название</span><input id="vitaminName" type="text" maxlength="80" placeholder="Например: Витамин D3"></label>
+      <label><span>Время</span><input id="vitaminTime" type="time"></label>
+      <label><span>Единица</span><input id="vitaminUnit" type="text" maxlength="16" placeholder="капс."></label>
+      <label class="full"><span>Описание / дозировка</span><textarea id="vitaminDetails" rows="3" placeholder="Например: после еды"></textarea></label>
     </div>
-    <button id="showNotifyPanel" class="link-btn">Показать настройку уведомлений</button>
+
+    <details open>
+      <summary>Курс</summary>
+      <div class="form-grid details-body">
+        <label class="toggle-label full"><input id="courseEnabled" type="checkbox"><span>Ограниченный курс</span></label>
+        <label><span>Дата начала</span><input id="courseStart" type="date"></label>
+        <label><span>Длительность, дней</span><input id="courseDays" type="number" min="1" max="1000" value="90"></label>
+        <label class="toggle-label full"><input id="coursePaused" type="checkbox"><span>Поставить курс на паузу</span></label>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Остаток в банке</summary>
+      <div class="form-grid details-body">
+        <label><span>Текущий остаток</span><input id="stockAmount" type="number" min="0" step="0.1" placeholder="Не задан"></label>
+        <label><span>Расход за один приём</span><input id="stockDose" type="number" min="0.1" step="0.1" value="1"></label>
+        <label><span>Порог «купить»</span><input id="stockLow" type="number" min="0" step="0.1" value="7"></label>
+        <label><span>Дата покупки</span><input id="buyDate" type="date"></label>
+      </div>
+    </details>
+
+    <div class="modal-actions">
+      <button id="deleteVitamin" class="danger">Удалить</button>
+      <button id="saveVitamin" class="primary">Сохранить</button>
+    </div>
   </div>
 </div>
 
 <div id="toast" class="toast hidden"></div>
-<footer>Данные и настройки сохраняются только на этом устройстве.<br><b>Версия 5.0</b></footer>
-<script src="app.js?v=5"></script>
+<footer>Vitamin Tracker Pro · <b>Версия 7.0</b></footer>
+<script src="app.js?v=7"></script>
 </body>
 </html>
