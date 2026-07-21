@@ -202,5 +202,21 @@ $("#notify").onclick=async()=>{
   updateNotificationPanel();
 };
 $("#settingsModal").onclick=e=>{if(e.target.id==="settingsModal")$("#settingsModal").classList.add("hidden")};
-if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("sw.js?v=5", { updateViaCache: "none" });
+      await registration.update();
+      let reloading = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (!reloading) {
+          reloading = true;
+          window.location.reload();
+        }
+      });
+    } catch (error) {
+      console.error("Service Worker error:", error);
+    }
+  });
+}
 render();
